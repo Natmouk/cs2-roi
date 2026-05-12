@@ -76,7 +76,7 @@ def fetch_lowest_price(client: httpx.Client, market_hash_name: str) -> float | N
         if not data.get("success"):
             return None
 
-        price_str = data.get("lowest_price")
+        price_str = data.get("lowest_price") or data.get("median_price")
         if not price_str:
             return None
 
