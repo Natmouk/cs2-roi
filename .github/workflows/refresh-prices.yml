@@ -1,0 +1,91 @@
+name: Refresh Prices
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 1am EST
+  workflow_dispatch:      # allows manual trigger from GitHub Actions UI
+
+jobs:
+
+  # Step 1: read cases.json and output a matrix of indices ─────────────────
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      indices: ${{ steps.get-indices.outputs.indices }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate case indices
+        id: get-indices
+        run: |
+          python -c "
+          import json
+          cases = json.loads(open('data/cases.json').read())['cases']
+          print('indices=' + json.dumps(list(range(len(cases)))))
+          " >> $GITHUB_OUTPUT
+
+  # Step 2: one job per case, all run in parallel ──────────────────────────
+  refresh:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        case_index: ${{ fromJson(needs.setup.outputs.indices) }}
+      fail-fast: false    # don't cancel other cases if one fails
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install httpx
+
+      - name: Fetch prices for case ${{ matrix.case_index }}
+        run: python scripts/refresh_prices.py --case-index ${{ matrix.case_index }}
+
+      - name: Upload partial prices file
+        uses: actions/upload-artifact@v4
+        with:
+          name: prices-case-${{ matrix.case_index }}
+          path: data/prices_case_${{ matrix.case_index }}.json
+          if-no-files-found: warn   # warn but don't fail if case had no listings
+
+  # Step 3: merge all partial files and commit prices.json ─────────────────
+  merge:
+    needs: refresh
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download all partial price files
+        uses: actions/download-artifact@v4
+        with:
+          path: data/
+          pattern: prices-case-*
+          merge-multiple: true
+
+      - name: Merge partial files into prices.json
+        run: python scripts/merge_prices.py
+
+      - name: Commit and push prices.json
+        run: |
+          git config user.name "price-bot"
+          git config user.email "price-bot@users.noreply.github.com"
+          git add data/prices.json
+          git commit -m "chore: refresh prices" || echo "No changes to commit"
+          git push
