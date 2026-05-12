@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CS2 Case ROI Analyzer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Header ────────────────────────────────────────────────────────────── -->
+  <header>
+    <div class="header-inner">
+      <div class="header-title">
+        <span class="header-icon">&#128274;</span>
+        <h1>CS2 Case ROI Analyzer</h1>
+      </div>
+      <p class="header-sub">
+        Expected value and ROI for every CS2 case, updated daily from the Steam Community Market.
+      </p>
+    </div>
+  </header>
+
+  <!-- ── Main ──────────────────────────────────────────────────────────────── -->
+  <main>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span id="status-text" class="status-text">Loading prices...</span>
+      <span id="last-updated" class="last-updated"></span>
+    </div>
+
+    <!-- Summary metrics -->
+    <section class="metrics-row" id="metrics-row">
+      <div class="metric-card">
+        <div class="metric-label">Cases tracked</div>
+        <div class="metric-value" id="metric-cases">--</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Key price</div>
+        <div class="metric-value">$2.49</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Best ROI</div>
+        <div class="metric-value positive" id="metric-best-roi">--</div>
+        <div class="metric-sub" id="metric-best-name"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Worst ROI</div>
+        <div class="metric-value negative" id="metric-worst-roi">--</div>
+        <div class="metric-sub" id="metric-worst-name"></div>
+      </div>
+    </section>
+
+    <!-- Controls -->
+    <section class="controls">
+      <div class="controls-left">
+        <label for="sort-select" class="sr-only">Sort cases by</label>
+        <select id="sort-select">
+          <option value="roi">Sort: ROI %</option>
+          <option value="ev">Sort: Expected Value</option>
+          <option value="price">Sort: Case Price</option>
+          <option value="alpha">Sort: Alphabetical</option>
+        </select>
+      </div>
+      <div class="controls-right">
+        <span class="legend-item"><span class="legend-dot positive-bg"></span>Positive ROI</span>
+        <span class="legend-item"><span class="legend-dot negative-bg"></span>Negative ROI</span>
+      </div>
+    </section>
+
+    <!-- Case cards grid -->
+    <section id="cards-section">
+      <div id="cards-grid" class="cards-grid">
+        <!-- Populated by app.js -->
+        <div class="loading-placeholder">Loading case data...</div>
+      </div>
+    </section>
+
+    <!-- Detail table -->
+    <section id="detail-section" class="detail-section hidden">
+      <div class="detail-header">
+        <div>
+          <h2 id="detail-title">--</h2>
+          <p id="detail-meta" class="detail-meta"></p>
+        </div>
+        <div class="detail-summary">
+          <div class="detail-stat">
+            <div class="detail-stat-label">Expected Value</div>
+            <div class="detail-stat-value" id="detail-ev">--</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-label">Total Cost</div>
+            <div class="detail-stat-value" id="detail-cost">--</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-label">ROI</div>
+            <div class="detail-stat-value" id="detail-roi">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="detail-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Rarity</th>
+              <th class="align-right">Weighted Price</th>
+              <th class="align-right">Drop Chance</th>
+              <th class="align-right">EV Contribution</th>
+            </tr>
+          </thead>
+          <tbody id="detail-tbody">
+            <!-- Populated by app.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-footnote">
+        Weighted price = float-probability-weighted average across all valid wear conditions, after Steam's 15% market cut.
+        Drop chance shown is per item (rarity rate divided equally among items of that rarity).
+        Knives and gloves excluded from EV calculation.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ────────────────────────────────────────────────────────────── -->
+  <footer>
+    <p>
+      Prices fetched daily from the Steam Community Market &mdash;
+      not affiliated with Valve or Steam.
+      Opening cases is gambling with negative expected value.
+    </p>
+  </footer>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
