@@ -1,0 +1,36 @@
+name: Refresh Prices
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 1am est
+  workflow_dispatch:      # allows manual trigger from GitHub Actions UI
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write     # allows the job to commit and push prices.json
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install httpx
+
+      - name: Run price refresh script
+        run: python scripts/refresh_prices.py
+
+      - name: Commit and push prices.json
+        run: |
+          git config user.name "price-bot"
+          git config user.email "price-bot@users.noreply.github.com"
+          git add data/prices.json
+          git commit -m "chore: refresh prices" || echo "No changes to commit"
+          git push
