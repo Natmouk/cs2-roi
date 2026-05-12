@@ -254,8 +254,8 @@ async function main() {
   try {
     // Load both JSON files in parallel
     const [casesData, pricesData] = await Promise.all([
-      loadJSON('../data/cases.json'),
-      loadJSON('../data/prices.json'),
+      loadJSON('data/cases.json'),
+      loadJSON('data/prices.json'),
     ]);
 
     const prices = pricesData.prices;
