@@ -31,7 +31,7 @@ STEAM_MARKET_URL = "https://steamcommunity.com/market/priceoverview/"
 APP_ID           = "730"        # CS2
 CURRENCY         = "1"          # USD
 STEAM_CUT        = 0.85         # Steam community market cut
-REQUEST_DELAY    = 3.0          # seconds between Steam requests
+REQUEST_DELAY    = 6.0          # seconds between Steam requests
 
 WEAR_THRESHOLDS = [
     ("Factory New",    0.00, 0.07),
